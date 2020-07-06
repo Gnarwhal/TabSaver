@@ -1,11 +1,14 @@
-<div id="$ID" class="parent">
-	<div class="parent-left">
-		<input id="tempEntryNameId" class="entry_name" value="$VALUE"></input>
-		$EXPAND
-	</div>
-	<div class="parent-right">
-		$RESTORE
-		$RESTORE_AND_REMOVE
-		$REMOVE
+<div class="super_parent">
+	<div id="$ID" class="parent">
+		<div class="delete_background"></div>
+		<div class="parent-left">
+			<input id="tempEntryNameId" class="entry_name" value="$VALUE"></input>
+			$EXPAND
+		</div>
+		<div class="parent-right">
+			$RESTORE
+			$RESTORE_AND_REMOVE
+			$REMOVE
+		</div>
 	</div>
 </div>

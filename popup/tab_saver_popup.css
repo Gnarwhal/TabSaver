@@ -66,8 +66,19 @@ input:focus {
 	display: none;
 }
 
+.super_parent {
+	width: 100%;
+	height: 35px;
+	box-sizing: border-box;
+	overflow: hidden;
+	transition-property: height;
+	transition-duration: 0.65s;
+	transition-delay: 0.1s;
+}
+
 .parent {
 	box-sizing: border-box;
+	overflow: hidden;
     width: 100%;
     height: 35px;
     border-bottom: solid 1px var(--main-border-color);
@@ -87,6 +98,7 @@ input:focus {
     width: 70%;
     height: 100%;
 	visibility: hidden;
+	position: relative;
 }
 
 .parent-right {
@@ -102,10 +114,9 @@ input:focus {
 
 .expand {
     height: 60%;
-	transition: fill 0.15s;
     fill: var(--main-background-color);
-	transition: transform 0.25s;
 	visibility: visible;
+	transition: fill 0.25s, transform 0.25s;
 }
 
 .expand:hover {
@@ -138,7 +149,7 @@ input:focus {
 .restore {
 	margin-right: 3%;
     height: 60%;
-	transition: fill 0.15s;
+	transition: fill 0.25s;
     fill: var(--main-background-color);
 	visibility: visible;
 }
@@ -150,7 +161,7 @@ input:focus {
 .restore_and_remove {
 	margin-right: 3%;
     height: 60%;
-	transition: fill 0.15s;
+	transition: fill 0.25s;
     fill: var(--main-background-color);
 	visibility: visible;
 }
@@ -161,7 +172,7 @@ input:focus {
 
 .remove {
     height: 60%;
-	transition: fill 0.15s;
+	transition: fill 0.25s;
     fill: var(--main-background-color);
 	visibility: visible;
 	margin-right: 3%;
@@ -171,4 +182,13 @@ input:focus {
     fill: #ff4252;
 }
 
-
+.delete_background {
+	position: absolute;
+	background-color: #ff4252;
+	margin-left: 100%;
+	width: 0%;
+	height: 100%;
+	float: right;
+	z-index: 0;
+	transition: margin-left 0.4s, width 0.4s;
+}

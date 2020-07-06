@@ -209,7 +209,6 @@ browser.runtime.onConnect.addListener(function(port) {
 			browser.windows.create({ url: urls })
 				.then(function(window) {
 					for (i of newTabs) {
-						console.log(i);
 						browser.tabs.create({ windowId: window.id, index: i }).catch(console.log);
 					}
 				})

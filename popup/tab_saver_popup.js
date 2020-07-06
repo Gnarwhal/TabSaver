@@ -57,12 +57,24 @@ const MESSAGES = {
 			port.postMessage({ type: "restore", data: { id: Number(parent.getAttribute("id")) } });
 		});
 		restore.removeAttribute("id");
+		async function removeEntry(parent) {
+			parent.children[0].style.marginLeft = "0%";
+			parent.children[0].style.width      = "100%";
+
+			parent.parentElement.style.height = "0%";
+
+			parent.parentElement.addEventListener("transitionend", (e) => {
+				if (e.propertyName === "height") {
+					parent.parentElement.parentElement.removeChild(parent.parentElement);
+				}
+			});
+		}
 		///////// SET RESTORE AND REMOVE PROPERTIES /////////
 		let restoreAndRemove = document.getElementById("tempRestoreAndRemoveId");
 		restoreAndRemove.addEventListener("click", function() {
-			let parent = remove.parentElement.parentElement;
+			let parent = restoreAndRemove.parentElement.parentElement;
 			port.postMessage({ type: "restoreAndRemove", data: { id: Number(parent.getAttribute("id")) } });
-			parent.parentElement.removeChild(parent);	
+			removeEntry(parent);
 		});
 		restoreAndRemove.removeAttribute("id");
 		///////// SET REMOVE PROPERTIES /////////
@@ -70,7 +82,7 @@ const MESSAGES = {
 		remove.addEventListener("click", function() {
 			let parent = remove.parentElement.parentElement;
 			port.postMessage({ type: "remove", data: { id: Number(parent.getAttribute("id")) } });
-			parent.parentElement.removeChild(parent);	
+			removeEntry(parent);
 		});
 		remove.removeAttribute("id");
 	},
@@ -86,7 +98,6 @@ function loadThenConnect() {
 	if (callCount === 5) {
 		port = browser.runtime.connect();
 		port.onMessage.addListener(function(message) {
-			console.log(message);
 			MESSAGES[message.type](message.data);
 		});
 	}
