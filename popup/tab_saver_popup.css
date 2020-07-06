@@ -1,0 +1,174 @@
+:root {
+	--main-background-color: #0A0D0F;
+	--main-border-color: #40454A;
+	--main-foreground-color: #dddddd;
+}
+
+html, body {
+    margin: 0px;
+    padding: 0px;
+}
+
+body {
+    width: 400px;
+    height: 550px;
+    border: solid 3px var(--main-border-color);
+	background-color: var(--main-background-color);
+}
+
+#dummy {
+	position: fixed;
+	visibility: hidden;
+}
+
+input:focus {
+	outline: none;
+}
+
+::placeholder {
+	color: 
+}
+
+#header {
+	width: 100%;
+	height: 60px;
+}
+
+#window_name {
+	box-sizing: border-box;
+    background-color: var(--main-background-color);
+	margin: 0px;
+	font-size: 35.5px;
+	font-family: "Josefin Sans", sans-serif;
+	padding: 2px;
+	padding-top: 12px;
+	border: 0px;
+	border-bottom: solid 3px var(--main-border-color);
+	width: 100%;
+	height: 60px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	resize: horizontal;
+	text-align: center;
+	color: var(--main-foreground-color);
+	text-overflow: ellipsis;
+}
+
+#list {
+	width: 100%;
+	height: 490px;
+	overflow-y: auto;
+	position: relative;
+}
+
+.filter_results {
+	display: none;
+}
+
+.parent {
+	box-sizing: border-box;
+    width: 100%;
+    height: 35px;
+    border-bottom: solid 1px var(--main-border-color);
+	position: relative;
+	transition: background-color 0.15s;
+	background-color: var(--main-background-color);
+}
+
+.parent:hover {
+	background-color: var(--main-border-color);
+}
+
+.parent-left {
+	float: left;
+    display: flex;
+    align-items: center;
+    width: 70%;
+    height: 100%;
+	visibility: hidden;
+}
+
+.parent-right {
+	float: right;
+	display: flex;
+	justify-content: flex-end;
+	align-items: center;
+	width: 30%;
+	height: 100%;
+	visibility: hidden;
+	position: relative;
+}
+
+.expand {
+    height: 60%;
+	transition: fill 0.15s;
+    fill: var(--main-background-color);
+	transition: transform 0.25s;
+	visibility: visible;
+}
+
+.expand:hover {
+    fill: var(--main-foreground-color);
+}
+
+.expanded {
+	fill: var(--main-foreground-color);
+	transform: rotate(90deg);
+}
+
+.entry_name {
+	box-sizing: border-box;
+	background: rgba(0, 0, 0, 0);
+	border: 0px;
+	margin: 0px;
+	padding: 0px;
+	transition: margin-left 0.25s;
+	margin-left: 2%;
+    color: #ffffff;
+	visibility: visible;
+	font-size: 100%;
+	font-family: "Josefin Sans", sans-serif;
+}
+
+.parent:hover .entry_name {
+	margin-left: 4%;
+}
+
+.restore {
+	margin-right: 3%;
+    height: 60%;
+	transition: fill 0.15s;
+    fill: var(--main-background-color);
+	visibility: visible;
+}
+
+.restore:hover {
+	fill: #00ff65;
+}
+
+.restore_and_remove {
+	margin-right: 3%;
+    height: 60%;
+	transition: fill 0.15s;
+    fill: var(--main-background-color);
+	visibility: visible;
+}
+
+.restore_and_remove:hover {
+	fill: #ffef3f;
+}
+
+.remove {
+    height: 60%;
+	transition: fill 0.15s;
+    fill: var(--main-background-color);
+	visibility: visible;
+	margin-right: 3%;
+}
+
+.remove:hover {
+    fill: #ff4252;
+}
+
+

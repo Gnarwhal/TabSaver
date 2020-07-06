@@ -1,0 +1,11 @@
+<div id="$ID" class="parent">
+	<div class="parent-left">
+		<input id="tempEntryNameId" class="entry_name" value="$VALUE"></input>
+		$EXPAND
+	</div>
+	<div class="parent-right">
+		$RESTORE
+		$RESTORE_AND_REMOVE
+		$REMOVE
+	</div>
+</div>
