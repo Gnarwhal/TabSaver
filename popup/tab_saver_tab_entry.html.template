@@ -1,0 +1,4 @@
+<div class="tab_parent">
+	<p class="tab_name">$TAB_NAME</p>
+	<p class="tab_url">$TAB_URL</p>
+</div>

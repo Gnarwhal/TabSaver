@@ -15,7 +15,7 @@ function load() {
 			function format(version) {
 				return "v" + version.number[0] + "." + version.number[1] + "." + version.number[2] + " - " + version.stage;
 			}
-			const CURRENT_VERSION = { number: [ 0, 0, 0 ], stage: "pre-alpha" };
+			const CURRENT_VERSION = { number: [ 0, 0, 1 ], stage: "pre-alpha" };
 			console.log("Version Info: " + format(CURRENT_VERSION));
 
 			// Handle version changes //
@@ -137,7 +137,7 @@ function tabRemovedListener(tab, removeInfo) {
 // Windows
 
 function windowCreatedListener(windowInfo) {
-	if (windowInfo.type === "normal") {
+	if (windowInfo.type === "normal" && !livingWindows.has(windowInfo.id)) {
 		let id = generateWindowId();
 		livingWindows.set(windowInfo.id, { globalId: id, name: generateName(id), tabs: new Map() });
 	}
@@ -198,18 +198,36 @@ browser.runtime.onConnect.addListener(function(port) {
 				++i;
 			}
 		}
+		let globalId = generateWindowId();
+		let name = data[index].name;
+
 		if (urls.length === 0) {
 			browser.windows.create()
 				.then(function(window) {
+					let tabs = new Map();
+					livingWindows.set(window.id, { globalId: globalId, name: name, tabs: tabs });
+					for (tab of window.tabs) {
+						tabs.set(tab.id, { title: tab.title, url: tab.url });
+					}
 					for (let i = 0; i < newTabs.length - 1; ++i) {
-						browser.tabs.create({ windowId: window.id }).catch(console.log);
+						browser.tabs.create({ windowId: window.id })
+							.then(function(tab) {
+								tabs.set(tab.id, { title: tab.title, url: tab.url });
+							})
+							.catch(console.log);
 					}
 				}).catch(console.log);
 		} else {
 			browser.windows.create({ url: urls })
 				.then(function(window) {
+					let tabs = new Map();
+					livingWindows.set(window.id, { globalId: globalId, name: name, tabs: tabs });
 					for (i of newTabs) {
-						browser.tabs.create({ windowId: window.id, index: i }).catch(console.log);
+						browser.tabs.create({ windowId: window.id, index: i })
+							.then(function(tab) {
+								tabs.set(tab.id, { title: tab.title, url: tab.url });
+							})
+							.catch(console.log);
 					}
 				})
 				.catch(console.log);
@@ -218,6 +236,12 @@ browser.runtime.onConnect.addListener(function(port) {
 	const MESSAGES = {
 		updateWindowName: function(message) {
 			livingWindows.get(message.active).name = message.name;
+		},
+		updateEntryName: function(message) {
+			let index = find(message.id);
+			if (index !== -1) {
+				data[index].name = message.name;
+			}
 		},
 		restore: function(message) {
 			let index = find(message.id);
@@ -240,9 +264,21 @@ browser.runtime.onConnect.addListener(function(port) {
 				saveData();
 			}
 		},
+		expandTabs: function(message) {
+			let index = find(message.id);
+			if (index !== -1) {
+				popupPort.postMessage({ type: "expandTabs", data: data[index] });
+			}
+		}
 	};
 	port.onMessage.addListener(function(message) {
 		MESSAGES[message.type](message.data);
+	});
+	popupPort.onDisconnect.addListener(function(e) {
+		if (e.error) {
+			console.log("Disconnect error: " + e.error.mesage);
+		}
+		popupPort = null;
 	});
 });
 

@@ -24,11 +24,6 @@ const MESSAGES = {
 		resizeInput(entryName);
 		entryName.addEventListener("input", (e) => resizeInput(e.target));
 		entryName.addEventListener("keyup", function(e) {
-			if (e.keyCode === 27) {
-				e.target.value = e.target.placeholder;
-				resizeInput(e.target);
-				e.target.blur();
-			}
 			if (e.keyCode === 13) {
 				e.target.blur();
 			}
@@ -38,41 +33,60 @@ const MESSAGES = {
 			if (entryName.value === "") {
 				entryName.value = entryName.placeholder;
 			}
+			let parent = entryName.parentElement.parentElement.parentElement;
+			port.postMessage({ type: "updateEntryName", data: { id: Number(parent.getAttribute("id")), name: entryName.value } });
 		});
 		entryName.removeAttribute("id");
 		///////// SET EXPAND PROPERTIES /////////
 		let expand = document.getElementById("tempExpandId");
 		expand.addEventListener("click", function() {
+			let parent = expand.parentElement.parentElement.parentElement;
 			if (expand.classList.contains("expanded")) {
 				expand.classList.remove("expanded");
+				parent.style.height = "35px";
+				function collapse(e) {
+					if (e.target === parent) {
+						for (let i = 1; i < parent.children.length;) {
+							parent.removeChild(parent.children[i]);
+						}
+					}
+					parent.removeEventListener("transitionend", collapse);
+				}
+				parent.addEventListener("transitionend", collapse);
 			} else {
 				expand.classList.add("expanded");
+				port.postMessage({ type: "expandTabs", data: { id: Number(parent.getAttribute("id")) } });
 			}
 		});
 		expand.removeAttribute("id");
 		///////// SET RESTORE PROPERTIES /////////
 		let restore = document.getElementById("tempRestoreId");
 		restore.addEventListener("click", function() {
-			let parent = restore.parentElement.parentElement;
+			let parent = restore.parentElement.parentElement.parentElement;
 			port.postMessage({ type: "restore", data: { id: Number(parent.getAttribute("id")) } });
 		});
 		restore.removeAttribute("id");
-		async function removeEntry(parent) {
-			parent.children[0].style.marginLeft = "0%";
-			parent.children[0].style.width      = "100%";
 
-			parent.parentElement.style.height = "0%";
+		///////// REMOVE ENTRY /////////
+		function removeEntry(parent) {
+			parent.children[0].children[0].style.marginLeft = "0%";
+			parent.children[0].children[0].style.width      = "100%";
 
-			parent.parentElement.addEventListener("transitionend", (e) => {
+			parent.style.transitionDelay = "0.1s";
+			parent.style.height = "0%";
+
+			parent.addEventListener("transitionend", (e) => {
 				if (e.propertyName === "height") {
-					parent.parentElement.parentElement.removeChild(parent.parentElement);
+					parent.parentElement.removeChild(parent);
 				}
 			});
 		}
+		////////////////////////////////
+
 		///////// SET RESTORE AND REMOVE PROPERTIES /////////
 		let restoreAndRemove = document.getElementById("tempRestoreAndRemoveId");
 		restoreAndRemove.addEventListener("click", function() {
-			let parent = restoreAndRemove.parentElement.parentElement;
+			let parent = restoreAndRemove.parentElement.parentElement.parentElement;
 			port.postMessage({ type: "restoreAndRemove", data: { id: Number(parent.getAttribute("id")) } });
 			removeEntry(parent);
 		});
@@ -80,11 +94,24 @@ const MESSAGES = {
 		///////// SET REMOVE PROPERTIES /////////
 		let remove = document.getElementById("tempRemoveId");
 		remove.addEventListener("click", function() {
-			let parent = remove.parentElement.parentElement;
+			let parent = remove.parentElement.parentElement.parentElement;
 			port.postMessage({ type: "remove", data: { id: Number(parent.getAttribute("id")) } });
 			removeEntry(parent);
 		});
 		remove.removeAttribute("id");
+	},
+	expandTabs: function(message) {
+		let parent = document.getElementById("" + message.id);
+		for (tab of message.tabs) {
+			let template = tabEntryTemplate;
+			template = template
+				.replace(/\$TAB_NAME/, tab.title)
+				.replace(/\$TAB_URL/, tab.url);
+			let element = document.createElement("template");
+			element.innerHTML = template;
+			parent.appendChild(element.content.firstChild);
+		}
+		parent.style.height = (message.tabs.length * 35 + 35) + "px";
 	},
 	complete: function() {
 		let loading = document.getElementById("loading");
@@ -95,7 +122,7 @@ const MESSAGES = {
 let callCount = 0;
 function loadThenConnect() {
 	++callCount;
-	if (callCount === 5) {
+	if (callCount === 6) {
 		port = browser.runtime.connect();
 		port.onMessage.addListener(function(message) {
 			MESSAGES[message.type](message.data);
@@ -148,6 +175,15 @@ fetch(browser.runtime.getURL("popup/remove.svg"))
 	})
 	.catch(function(e) { console.log(e); removeSvg = null; });
 
+let tabEntryTemplate = false;
+fetch(browser.runtime.getURL("popup/tab_saver_tab_entry.html.template"))
+	.then(response => response.text())
+	.then(function(response) {
+		tabEntryTemplate = response;
+		loadThenConnect();
+	})
+	.catch(function(e) { console.log(e); tabEntryTemplate = null; });
+
 let dummy = null;
 function textWidth(text, fontFamily, fontSize) {
 	dummy.style.fontFamily = fontFamily;
@@ -174,6 +210,11 @@ function resizeInput(element) {
 }
 
 window.addEventListener("load", function() {
+	window.addEventListener("unload", function(e) {
+		console.log(e);
+		port.disconnect();
+		port = false;
+	});
 	dummy = document.getElementById("dummy");
 
 	let elements = document.getElementsByClassName("expand");
