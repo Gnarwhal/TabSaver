@@ -38,6 +38,8 @@ function load() {
 				.then(function(id) {
 					if (id.global_window_id === undefined) {
 						globalWindowId = 0;
+					} else {
+						globalWindowId = id.global_window_id;
 					}
 					getCurrentWindows();
 				})
@@ -170,7 +172,7 @@ browser.runtime.onConnect.addListener(function(port) {
 	if (livingWindows !== null) {
 		sendLoadedWindowInfo();
 	} else {
-		sendData = sendLoadedWindowInfo;
+		sendWindowInfo = sendLoadedWindowInfo;
 	}
 	if (data !== null) {
 		sendLoadedData();
@@ -278,6 +280,8 @@ browser.runtime.onConnect.addListener(function(port) {
 		if (e.error) {
 			console.log("Disconnect error: " + e.error.mesage);
 		}
+		sendData = nop;
+		sendWindowInfo = nop;
 		popupPort = null;
 	});
 });
@@ -285,12 +289,18 @@ browser.runtime.onConnect.addListener(function(port) {
 function nop() {}
 
 function sendLoadedData() {
-	for (item of data) {
-		popupPort.postMessage({ type: "addState", data: { id: item.id, name: item.name } });
+	for (let i = data.length - 1; i >= 0; --i) {
+		if (popupPort === null) {
+			return;
+		}
+		popupPort.postMessage({ type: "addState", data: { id: data[i].id, name: data[i].name } });
 	}
 	popupPort.postMessage({ type: "complete", data: undefined });
 }
 
 function sendLoadedWindowInfo() {
+	if (popupPort === null) {
+		return;
+	}
 	popupPort.postMessage({ type: "activeWindow", data: { active: activeWindow, name: livingWindows.get(activeWindow).name } });
 }

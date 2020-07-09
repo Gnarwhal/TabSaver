@@ -4,7 +4,11 @@ let activeWindow = -1;
 const MESSAGES = {
 	activeWindow: function(message) {
 		activeWindow = message.active;
-		document.getElementById("window_name").value = message.name;
+		let windowName = document.getElementById("window_name");
+		windowName.style.display = "flex";
+		windowName.value = message.name;
+		let headerLoading = document.getElementById("header_loading");
+		headerLoading.parentElement.removeChild(headerLoading);
 	},
 	addState: function(message) {
 		let template = entryTemplate;
@@ -18,7 +22,10 @@ const MESSAGES = {
 			.replace(/\$REMOVE/, removeSvg);
 		let element = document.createElement("template");
 		element.innerHTML = template;
-		document.getElementById("list").insertBefore(element.content.firstChild, document.getElementById("loading"));
+		document.getElementById("list").insertBefore(element.content.firstChild, document.getElementById("entry_loading"));
+		let superParent = document.getElementById(message.id.toString());
+		window.getComputedStyle(superParent).getPropertyValue("height");
+		document.getElementById(message.id.toString()).style.height = "35px";
 		///////// SET ENTRY NAME PROPERTIES /////////
 		let entryName = document.getElementById("tempEntryNameId");
 		resizeInput(entryName);
@@ -101,20 +108,26 @@ const MESSAGES = {
 		remove.removeAttribute("id");
 	},
 	expandTabs: function(message) {
-		let parent = document.getElementById("" + message.id);
+		let parent = document.getElementById(message.id.toString());
+		let language = navigator.languages[0];
+		let options = {};
+		let template = dateEntryTemplate
+			.replace(/\$DATE/, new Date(message.date).toLocaleString(language, options));
+		let element = document.createElement("template");
+		element.innerHTML = template;
+		parent.appendChild(element.content.firstChild);
 		for (tab of message.tabs) {
-			let template = tabEntryTemplate;
-			template = template
+			template = tabEntryTemplate
 				.replace(/\$TAB_NAME/, tab.title)
 				.replace(/\$TAB_URL/, tab.url);
-			let element = document.createElement("template");
+			element = document.createElement("template");
 			element.innerHTML = template;
 			parent.appendChild(element.content.firstChild);
 		}
-		parent.style.height = (message.tabs.length * 35 + 35) + "px";
+		parent.style.height = (message.tabs.length * 35 + 70) + "px";
 	},
 	complete: function() {
-		let loading = document.getElementById("loading");
+		let loading = document.getElementById("entry_loading");
 		loading.parentElement.removeChild(loading);
 	}
 };
@@ -195,6 +208,16 @@ fetch(browser.runtime.getURL("popup/tab_saver_tab_entry.html.template"))
 	})
 	.catch(function(e) { console.log(e); tabEntryTemplate = null; });
 
+let dateEntryTemplate = false;
+registerDependency();
+fetch(browser.runtime.getURL("popup/tab_saver_date_entry.html.template"))
+	.then(response => response.text())
+	.then(function(response) {
+		dateEntryTemplate = response;
+		loadThenConnect();
+	})
+	.catch(function(e) { console.log(e); tabEntryTemplate = null; });
+
 let dummy = null;
 function textWidth(text, fontFamily, fontSize) {
 	dummy.style.fontFamily = fontFamily;
@@ -223,7 +246,6 @@ function resizeInput(element) {
 registerDependency();
 window.addEventListener("load", function() {
 	window.addEventListener("unload", function(e) {
-		console.log(e);
 		port.disconnect();
 		port = false;
 	});

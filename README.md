@@ -15,10 +15,9 @@ this will be updated.
 
 I have a nasty tendency to write these and then never act on them. So...don't get your hopes up. 
 
-### Fixes
-
-- Finish loading message
-- Testing. Lots of testing. \*closes book\* Like that's ever gonna happen.
+1. Testing. Lots of testing. \*closes book\* Like that's ever gonna happen.
+2. Add more features
+3. Rinse and repeat
 
 ### Feature Ideas
 

@@ -4,6 +4,8 @@
 	--secondary-border-color: #20252A;
 	--main-foreground-color: #dddddd;
 	--secondary-foreground-color: #666666;
+	--main-info-color: #ff7f8a;/* #64cfdb; */
+	--secondary-info-color: #8c383f;/* #266f77; */
 }
 
 html, body {
@@ -32,12 +34,23 @@ input:focus {
 	color: var(--secondary-foreground-color);
 }
 
+#header_loading {
+	font-family: "Josefin Sans", sans-serif;
+	color: var(--secondary-foreground-color);
+	text-align: center;
+	height: 60px;
+	font-size: 35.5px;
+	line-height: 60px;
+}
+
 #header {
 	width: 100%;
-	height: 60px;
+	height: max-content;
+	border-bottom: solid 3px var(--main-border-color);
 }
 
 #window_name {
+	display: none;
 	box-sizing: border-box;
     background-color: var(--main-background-color);
 	margin: 0px;
@@ -46,10 +59,8 @@ input:focus {
 	padding: 2px;
 	padding-top: 12px;
 	border: 0px;
-	border-bottom: solid 3px var(--main-border-color);
 	width: 100%;
 	height: 60px;
-	display: flex;
 	justify-content: center;
 	align-items: center;
 	text-align: center;
@@ -68,61 +79,30 @@ input:focus {
 	display: none;
 }
 
+#entry_loading {
+	font-family: "Josefin Sans", sans-serif;
+	color: var(--secondary-foreground-color);
+	text-align: center;
+	height: 35px;
+	font-size: 100%;
+	line-height: 35px;
+}
+
 .super_parent {
 	width: 100%;
-	height: 35px;
+	height: 0px;
 	box-sizing: border-box;
 	overflow: hidden;
 	transition-property: height;
 	transition-duration: 0.5s;
 	position: relative;
-}
-
-.tab_parent {
-	box-sizing: border-box;
-	width: 100%;
-	height: 35px;
-	border-bottom: solid 1px var(--secondary-border-color);
-	transition: background-color 0.15s;
-	background-color: var(--main-background-color);
-	position: relative;
-	display: flex;
-	justify-content: flex-start;
-	align-items: center;
-	overflow: hidden;
-}
-
-.tab_parent:hover {
-	background-color: var(--secondary-border-color);
-}
-
-.tab_name {
-	padding-left: 25px;
-	font-size: 100%;
-	font-family: "Josefin Sans", sans-serif;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	width: calc(50% - 50px);
-	color: var(--main-foreground-color);
-	white-space: nowrap;
-}
-
-.tab_url {
-	padding-left: 25px;
-	width: 50%;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	font-size: 100%;
-	font-family: "Josefin Sans", sans-serif;
-	color: var(--secondary-foreground-color);
-	white-space: nowrap;
+    border-bottom: solid 1px var(--main-border-color);
 }
 
 .parent {
 	box-sizing: border-box;
     width: 100%;
     height: 35px;
-    border-bottom: solid 1px var(--main-border-color);
 	position: relative;
 	transition: background-color 0.15s;
 	background-color: var(--main-background-color);
@@ -198,7 +178,11 @@ input:focus {
 }
 
 .restore:hover {
-	fill: #00ff65;
+	fill: #00ff6a;
+}
+
+.restore:active {
+	fill: #007f35;
 }
 
 .restore_and_remove {
@@ -213,6 +197,10 @@ input:focus {
 	fill: #ffef3f;
 }
 
+.restore_and_remove:active {
+	fill: #7f7400;
+}
+
 .remove {
     height: 60%;
 	transition: fill 0.25s;
@@ -225,6 +213,10 @@ input:focus {
     fill: #ff4252;
 }
 
+.remove:active {
+    fill: #cc1426;
+}
+
 .delete_background {
 	position: absolute;
 	background-color: #ff4252;
@@ -234,4 +226,84 @@ input:focus {
 	float: right;
 	z-index: 0;
 	transition: margin-left 0.4s, width 0.4s;
+}
+
+.tab_parent {
+	box-sizing: border-box;
+	width: 100%;
+	height: 35px;
+	border-top: solid 1px var(--secondary-border-color);
+	transition: background-color 0.15s;
+	background-color: var(--main-background-color);
+	position: relative;
+	display: flex;
+	justify-content: flex-start;
+	align-items: center;
+	overflow: hidden;
+}
+
+.tab_parent:hover {
+	background-color: var(--secondary-border-color);
+}
+
+.tab_name {
+	padding-left: 25px;
+	font-size: 100%;
+	font-family: "Josefin Sans", sans-serif;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	width: calc(50% - 50px);
+	color: var(--main-foreground-color);
+	white-space: nowrap;
+}
+
+.tab_url {
+	padding-left: 25px;
+	width: 50%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	font-size: 100%;
+	font-family: "Josefin Sans", sans-serif;
+	color: var(--secondary-foreground-color);
+	white-space: nowrap;
+}
+
+.date_parent {
+	box-sizing: border-box;
+	width: 100%;
+	height: 35px;
+	border-top: solid 1px var(--secondary-border-color);
+	transition: background-color 0.15s;
+	background-color: var(--main-background-color);
+	position: relative;
+	display: flex;
+	justify-content: flex-start;
+	align-items: center;
+	overflow: hidden;
+}
+
+.date_parent:hover {
+	background-color: var(--secondary-border-color);
+}
+
+.date_literal {
+	padding-left: 25px;
+	font-size: 100%;
+	font-family: "Josefin Sans", sans-serif;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	width: calc(50% - 50px);
+	color: var(--main-info-color);
+	white-space: nowrap;
+}
+
+.date_variable {
+	padding-left: 25px;
+	width: 50%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	font-size: 100%;
+	font-family: "Josefin Sans", sans-serif;
+	color: var(--secondary-info-color);
+	white-space: nowrap;
 }
