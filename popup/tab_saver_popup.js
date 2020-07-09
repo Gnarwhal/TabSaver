@@ -153,8 +153,7 @@ const MESSAGES = {
 		remove.removeAttribute("id");
 	},
 	complete: function() {
-		let loading = document.getElementById("entry_loading");
-		loading.parentElement.removeChild(loading);
+		document.getElementById("entry_loading").style.display = "none";
 	}
 };
 
