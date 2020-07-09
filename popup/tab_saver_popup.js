@@ -119,10 +119,15 @@ const MESSAGES = {
 	}
 };
 
+let dependencyCount = 0;
+function registerDependency() {
+	++dependencyCount;
+}
+
 let callCount = 0;
 function loadThenConnect() {
 	++callCount;
-	if (callCount === 6) {
+	if (callCount === dependencyCount) {
 		port = browser.runtime.connect();
 		port.onMessage.addListener(function(message) {
 			MESSAGES[message.type](message.data);
@@ -131,6 +136,7 @@ function loadThenConnect() {
 }
 
 let entryTemplate = false;
+registerDependency();
 fetch(browser.runtime.getURL("popup/tab_saver_entry.html.template"))
 	.then(response => response.text())
 	.then(function(response) {
@@ -140,6 +146,7 @@ fetch(browser.runtime.getURL("popup/tab_saver_entry.html.template"))
 	.catch(function(e) { console.log(e); entryTemplate = null; });
 
 let expandSvg = false;
+registerDependency();
 fetch(browser.runtime.getURL("popup/expand.svg"))
 	.then(response => response.text())
 	.then(function(response) {
@@ -149,6 +156,7 @@ fetch(browser.runtime.getURL("popup/expand.svg"))
 	.catch(function(e) { console.log(e); expandSvg = null; });
 
 let restoreSvg = false;
+registerDependency();
 fetch(browser.runtime.getURL("popup/restore.svg"))
 	.then(response => response.text())
 	.then(function(response) {
@@ -158,6 +166,7 @@ fetch(browser.runtime.getURL("popup/restore.svg"))
 	.catch(function(e) { console.log(e); restoreSvg = null; });
 
 let restoreAndRemoveSvg = false;
+registerDependency();
 fetch(browser.runtime.getURL("popup/restore_and_remove.svg"))
 	.then(response => response.text())
 	.then(function(response) {
@@ -167,6 +176,7 @@ fetch(browser.runtime.getURL("popup/restore_and_remove.svg"))
 	.catch(function(e) { console.log(e); restoreAndRemoveSvg = null; });
 
 let removeSvg = false;
+registerDependency();
 fetch(browser.runtime.getURL("popup/remove.svg"))
 	.then(response => response.text())
 	.then(function(response) {
@@ -176,6 +186,7 @@ fetch(browser.runtime.getURL("popup/remove.svg"))
 	.catch(function(e) { console.log(e); removeSvg = null; });
 
 let tabEntryTemplate = false;
+registerDependency();
 fetch(browser.runtime.getURL("popup/tab_saver_tab_entry.html.template"))
 	.then(response => response.text())
 	.then(function(response) {
@@ -209,6 +220,7 @@ function resizeInput(element) {
 	element.style.width = newWidth + "px";
 }
 
+registerDependency();
 window.addEventListener("load", function() {
 	window.addEventListener("unload", function(e) {
 		console.log(e);
