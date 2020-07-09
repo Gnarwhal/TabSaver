@@ -22,10 +22,53 @@ const MESSAGES = {
 			.replace(/\$REMOVE/, removeSvg);
 		let element = document.createElement("template");
 		element.innerHTML = template;
-		document.getElementById("list").insertBefore(element.content.firstChild, document.getElementById("entry_loading"));
+		document.getElementById("list").prepend(element.content.firstChild);
 		let superParent = document.getElementById(message.id.toString());
 		window.getComputedStyle(superParent).getPropertyValue("height");
-		document.getElementById(message.id.toString()).style.height = "35px";
+		superParent.style.height = "35px";
+		let language = navigator.languages[0];
+		let options = {};
+		template = dateEntryTemplate
+			.replace(/\$DATE/, new Date(message.date).toLocaleString(language, options));
+		element = document.createElement("template");
+		element.innerHTML = template;
+		superParent.appendChild(element.content.firstChild);
+		for (tab of message.tabs) {
+			template = tabEntryTemplate
+				.replace(/\$TAB_NAME/, tab.title)
+				.replace(/\$TAB_URL/, tab.url);
+			element = document.createElement("template");
+			element.innerHTML = template;
+			superParent.appendChild(element.content.firstChild);
+			let tabParent = superParent.lastChild;
+			let urlDiv = tabParent.children[3];
+			urlDiv.addEventListener("animationiteration", function(e) {
+				urlDiv.style.animationPlayState = "paused";
+			});
+			tabParent.addEventListener("click", function(e) {
+				let superHeight = superParent.style.height;
+				superHeight = Number(superHeight.substring(0, superHeight.length - 2));
+				if (tabParent.classList.contains("tab_parent_expanded")) {
+					tabParent.classList.remove("tab_parent_expanded");
+					tabParent.children[0].classList.remove("tab_name_literal_expanded");
+					tabParent.children[1].classList.remove("tab_name_expanded");
+					tabParent.children[2].classList.remove("tab_url_literal_expanded");
+					tabParent.children[3].classList.remove("tab_url_expanded");
+					superHeight -= 35;
+					superParent.style.transitionDelay = "0.25s";
+				} else {
+					tabParent.classList.add("tab_parent_expanded");
+					tabParent.children[0].classList.add("tab_name_literal_expanded");
+					tabParent.children[1].classList.add("tab_name_expanded");
+					tabParent.children[2].classList.add("tab_url_literal_expanded");
+					tabParent.children[3].classList.add("tab_url_expanded");
+					superHeight += 35;
+					superParent.style.transitionDelay = "0s";
+				}
+				superParent.style.transitionDuration = "0.25s";
+				superParent.style.height = superHeight + "px";
+			});
+		}
 		///////// SET ENTRY NAME PROPERTIES /////////
 		let entryName = document.getElementById("tempEntryNameId");
 		resizeInput(entryName);
@@ -47,22 +90,21 @@ const MESSAGES = {
 		///////// SET EXPAND PROPERTIES /////////
 		let expand = document.getElementById("tempExpandId");
 		expand.addEventListener("click", function() {
-			let parent = expand.parentElement.parentElement.parentElement;
 			if (expand.classList.contains("expanded")) {
 				expand.classList.remove("expanded");
-				parent.style.height = "35px";
-				function collapse(e) {
-					if (e.target === parent) {
-						for (let i = 1; i < parent.children.length;) {
-							parent.removeChild(parent.children[i]);
-						}
-					}
-					parent.removeEventListener("transitionend", collapse);
-				}
-				parent.addEventListener("transitionend", collapse);
+				superParent.style.transitionDelay = "0s";
+				superParent.style.transitionDuration = "0.5s";
+				superParent.style.height = "35px";
 			} else {
 				expand.classList.add("expanded");
-				port.postMessage({ type: "expandTabs", data: { id: Number(parent.getAttribute("id")) } });
+				let superHeight = 0;
+				for (child of superParent.children) {
+					superHeight += 35;
+					if (child.classList.contains("tab_parent_expanded")) {
+						superHeight += 35;
+					}
+				}
+				superParent.style.height = superHeight + "px";
 			}
 		});
 		expand.removeAttribute("id");
@@ -79,11 +121,14 @@ const MESSAGES = {
 			parent.children[0].children[0].style.marginLeft = "0%";
 			parent.children[0].children[0].style.width      = "100%";
 
+			parent.style.transitionDuration = "0.5s";
 			parent.style.transitionDelay = "0.1s";
 			parent.style.height = "0%";
 
 			parent.addEventListener("transitionend", (e) => {
-				if (e.propertyName === "height") {
+				let height = window.getComputedStyle(parent).getPropertyValue("height");
+				height = Number(height.substring(0, height.length - 2));
+				if (e.propertyName === "height" && height < 10) {
 					parent.parentElement.removeChild(parent);
 				}
 			});
@@ -106,25 +151,6 @@ const MESSAGES = {
 			removeEntry(parent);
 		});
 		remove.removeAttribute("id");
-	},
-	expandTabs: function(message) {
-		let parent = document.getElementById(message.id.toString());
-		let language = navigator.languages[0];
-		let options = {};
-		let template = dateEntryTemplate
-			.replace(/\$DATE/, new Date(message.date).toLocaleString(language, options));
-		let element = document.createElement("template");
-		element.innerHTML = template;
-		parent.appendChild(element.content.firstChild);
-		for (tab of message.tabs) {
-			template = tabEntryTemplate
-				.replace(/\$TAB_NAME/, tab.title)
-				.replace(/\$TAB_URL/, tab.url);
-			element = document.createElement("template");
-			element.innerHTML = template;
-			parent.appendChild(element.content.firstChild);
-		}
-		parent.style.height = (message.tabs.length * 35 + 70) + "px";
 	},
 	complete: function() {
 		let loading = document.getElementById("entry_loading");

@@ -5,7 +5,9 @@
 	--main-foreground-color: #dddddd;
 	--secondary-foreground-color: #666666;
 	--main-info-color: #ff7f8a;/* #64cfdb; */
-	--secondary-info-color: #8c383f;/* #266f77; */
+	--secondary-info-color: #7f3339;/* #266f77; */
+	--main-hover-color: #64cfdb;
+	--main-active-color: #266f77;
 }
 
 html, body {
@@ -236,36 +238,116 @@ input:focus {
 	transition: background-color 0.15s;
 	background-color: var(--main-background-color);
 	position: relative;
-	display: flex;
-	justify-content: flex-start;
-	align-items: center;
 	overflow: hidden;
+	transition: height 0.25s;
+	transition-delay: 0.25s;
 }
 
 .tab_parent:hover {
 	background-color: var(--secondary-border-color);
 }
 
+.tab_parent_expanded {
+	height: 70px;
+	transition-delay: 0s;
+}
+
+.tab_name_literal {
+	margin: 0px;
+	box-sizing: border-box;
+	height: 35px;
+	line-height: 35px;
+	padding-left: 25px;
+	font-size: 100%;
+	font-family: "Josefin Sans", sans-serif;
+	overflow: hidden;
+	width: 25px;
+	color: var(--main-foreground-color);
+	white-space: nowrap;
+	position: absolute;
+	transition-property: padding-left color;
+	transition-duration: 0.25s;
+	transition-delay: 0s;
+}
+
+.tab_name_literal_expanded {
+	width: calc(12% + 25px);
+	transition-delay: 0.25s;
+}
+
+.tab_url_literal {
+	margin: 0px;
+	margin-top: 35px;
+	box-sizing: border-box;
+	height: 35px;
+	line-height: 35px;
+	padding-left: 25px;
+	font-size: 100%;
+	font-family: "Josefin Sans", sans-serif;
+	overflow: hidden;
+	width: 25px;
+	color: var(--main-foreground-color);
+	white-space: nowrap;
+	position: absolute;
+	transition-property: padding-left color;
+	transition-duration: 0.25s;
+	transition-delay: 0s;
+}
+
+.tab_url_literal_expanded {
+	width: calc(12% + 25px);
+	transition-delay: 0.25s;
+}
+
 .tab_name {
+	margin: 0px;
+	box-sizing: border-box;
+	height: 35px;
+	line-height: 35px;
 	padding-left: 25px;
 	font-size: 100%;
 	font-family: "Josefin Sans", sans-serif;
 	overflow: hidden;
 	text-overflow: ellipsis;
-	width: calc(50% - 50px);
+	width: calc(50% - 25px);
 	color: var(--main-foreground-color);
 	white-space: nowrap;
+	position: absolute;
+	transition-property: padding-left color;
+	transition-duration: 0.25s;
+	transition-delay: 0s;
+}
+
+.tab_name_expanded {
+	color: var(--secondary-foreground-color);
+	padding-left: calc(12% + 50px);
+	width: 100%;
+	transition-delay: 0.25s;
 }
 
 .tab_url {
-	padding-left: 25px;
-	width: 50%;
+	margin: 0px;
+	box-sizing: border-box;
+	height: 35px;
+	line-height: 35px;
+	margin-left: 50%;
+	width: 100%;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	font-size: 100%;
 	font-family: "Josefin Sans", sans-serif;
 	color: var(--secondary-foreground-color);
 	white-space: nowrap;
+	position: absolute;
+	transition-property: margin-top, margin-left;
+	transition-duration: 0.25s, 0.25s;
+	transition-delay: 0.25s, 0s;
+}
+
+.tab_url_expanded {
+	margin-top: 35px;
+	margin-left: calc(12% + 50px);
+	transition-delay: 0s, 0.25s;
 }
 
 .date_parent {
@@ -276,9 +358,6 @@ input:focus {
 	transition: background-color 0.15s;
 	background-color: var(--main-background-color);
 	position: relative;
-	display: flex;
-	justify-content: flex-start;
-	align-items: center;
 	overflow: hidden;
 }
 
@@ -287,23 +366,33 @@ input:focus {
 }
 
 .date_literal {
+	margin: 0px;
+	box-sizing: border-box;
+	height: 35px;
+	line-height: 35px;
 	padding-left: 25px;
-	font-size: 100%;
+	font-size: 16px;
 	font-family: "Josefin Sans", sans-serif;
 	overflow: hidden;
 	text-overflow: ellipsis;
-	width: calc(50% - 50px);
+	width: calc(50% - 25px);
 	color: var(--main-info-color);
 	white-space: nowrap;
+	position: absolute;
 }
 
 .date_variable {
-	padding-left: 25px;
-	width: 50%;
+	margin: 0px;
+	box-sizing: border-box;
+	height: 35px;
+	line-height: 35px;
+	padding-left: 50%;
+	width: 100%;
 	overflow: hidden;
 	text-overflow: ellipsis;
-	font-size: 100%;
+	font-size: 16px;
 	font-family: "Josefin Sans", sans-serif;
 	color: var(--secondary-info-color);
 	white-space: nowrap;
+	position: absolute;
 }

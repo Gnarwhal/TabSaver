@@ -1,7 +1,7 @@
 let data           = null;
 let livingWindows  = null;
 let activeWindow   = -1;
-let popupPort      = null;
+let popupPorts     = [];
 let globalWindowId = 0;
 
 let sendData       = nop;
@@ -30,7 +30,9 @@ function load() {
 					} else {
 						data = saveData.save_data;
 					}
-					sendData();
+					for (port of popupPorts) {
+						sendData(port);
+					}
 				})
 				.catch(console.log);
 
@@ -67,7 +69,9 @@ function load() {
 						browser.windows.onCreated.addListener(windowCreatedListener);
 						browser.windows.onFocusChanged.addListener(windowFocusChangedListener);
 						browser.windows.onRemoved.addListener(windowRemovedListener);
-						sendWindowInfo();
+						for (port of popupPorts) {
+							sendWindowInfo(port);
+						}
 					})
 					.catch(console.log);
 			}
@@ -158,8 +162,12 @@ function windowRemovedListener(windowInfo) {
 	if (livingWindows.has(windowInfo)) {
 		let windowData = livingWindows.get(windowInfo);
 		if (windowData.tabs.size > 0) {
-			data.push({ id: windowData.globalId, name: windowData.name, date: Date.now(), tabs: Array.from(windowData.tabs.values()) });
+			let obj = { id: windowData.globalId, name: windowData.name, date: Date.now(), tabs: Array.from(windowData.tabs.values()) };
+			data.push(obj);
 			saveData();
+			for (port of popupPorts) {
+				port.postMessage({ type: "addState", data: data[data.length - 1] });
+			}
 		}
 		browser.storage.local.set({ global_window_id: globalWindowId }).catch(console.log);
 		livingWindows.delete(windowInfo);
@@ -168,14 +176,14 @@ function windowRemovedListener(windowInfo) {
 //////////////////////////////////////////
 
 browser.runtime.onConnect.addListener(function(port) {
-	popupPort = port;
+	popupPorts.push(port);
 	if (livingWindows !== null) {
-		sendLoadedWindowInfo();
+		sendLoadedWindowInfo(port);
 	} else {
 		sendWindowInfo = sendLoadedWindowInfo;
 	}
 	if (data !== null) {
-		sendLoadedData();
+		sendLoadedData(port);
 	} else {
 		sendData = sendLoadedData;
 	}
@@ -265,42 +273,34 @@ browser.runtime.onConnect.addListener(function(port) {
 				data.splice(index, 1);
 				saveData();
 			}
-		},
-		expandTabs: function(message) {
-			let index = find(message.id);
-			if (index !== -1) {
-				popupPort.postMessage({ type: "expandTabs", data: data[index] });
-			}
 		}
 	};
 	port.onMessage.addListener(function(message) {
 		MESSAGES[message.type](message.data);
 	});
-	popupPort.onDisconnect.addListener(function(e) {
+	port.onDisconnect.addListener(function(e) {
 		if (e.error) {
 			console.log("Disconnect error: " + e.error.mesage);
 		}
 		sendData = nop;
 		sendWindowInfo = nop;
-		popupPort = null;
+		for (let i = 0; i < popupPorts.length; ++i) {
+			if (popupPorts[i] == port) {
+				popupPorts.splice(i, 1);
+			}
+		}
 	});
 });
 
 function nop() {}
 
-function sendLoadedData() {
-	for (let i = data.length - 1; i >= 0; --i) {
-		if (popupPort === null) {
-			return;
-		}
-		popupPort.postMessage({ type: "addState", data: { id: data[i].id, name: data[i].name } });
+function sendLoadedData(port) {
+	for (let i = 0; i < data.length; ++i) {
+		port.postMessage({ type: "addState", data: data[i] });
 	}
-	popupPort.postMessage({ type: "complete", data: undefined });
+	port.postMessage({ type: "complete", data: undefined });
 }
 
-function sendLoadedWindowInfo() {
-	if (popupPort === null) {
-		return;
-	}
-	popupPort.postMessage({ type: "activeWindow", data: { active: activeWindow, name: livingWindows.get(activeWindow).name } });
+function sendLoadedWindowInfo(port) {
+	port.postMessage({ type: "activeWindow", data: { active: activeWindow, name: livingWindows.get(activeWindow).name } });
 }
