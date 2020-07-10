@@ -5,22 +5,22 @@
 
 	"description": "Saves your tabs when you close a window so that they can be restored later",
 	"icons": {
-		"32": "icons/tab_saver_icon.svg",
-		"48": "icons/tab_saver_icon.svg",
-		"96": "icons/tab_saver_icon.svg",
-		"128": "icons/tab_saver_icon.svg"
+		"32": "icons/logo.svg",
+		"48": "icons/logo.svg",
+		"96": "icons/logo.svg",
+		"128": "icons/logo.svg"
 	},
 	"background": {
-		"scripts": [ "background/tab_saver_background.js" ]
+		"scripts": [ "background/background.js" ]
 	},
 	"browser_action": {
-		"default_icon": "icons/tab_saver_icon.svg",
+		"default_icon": "icons/icon.svg",
 		"default_title": "Tab Saver",
-		"default_popup": "popup/tab_saver_popup.html"
+		"default_popup": "popup/src/popup.html"
 	},
 	"web_accessible_resources": [
-		"popup/tab_saver_entry.html.template",
-		"popup/*.svg"
+		"popup/res/*",
+		"popup/src/templates/*"
 	],
 	"permissions": [
 		"activeTab",

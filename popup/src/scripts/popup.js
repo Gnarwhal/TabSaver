@@ -1,4 +1,4 @@
-let port = false;
+let port = null;
 
 let activeWindow = -1;
 const MESSAGES = {
@@ -11,15 +11,14 @@ const MESSAGES = {
 		headerLoading.parentElement.removeChild(headerLoading);
 	},
 	addState: function(message) {
-		let template = entryTemplate;
 		///////// FILL OUT TEMPLATE /////////
-		template = template
+		let template = resources["popup/src/templates/window_entry.html.template"]
 			.replace(/\$ID/, message.id)
 			.replace(/\$VALUE/, message.name)
-			.replace(/\$EXPAND/, expandSvg)
-			.replace(/\$RESTORE/, restoreSvg)
-			.replace(/\$RESTORE_AND_REMOVE/, restoreAndRemoveSvg)
-			.replace(/\$REMOVE/, removeSvg);
+			.replace(/\$EXPAND/, resources["popup/res/expand.svg"])
+			.replace(/\$RESTORE/, resources["popup/res/restore.svg"])
+			.replace(/\$RESTORE_AND_REMOVE/, resources["popup/res/restore_and_remove.svg"])
+			.replace(/\$REMOVE/, resources["popup/res/remove.svg"]);
 		let element = document.createElement("template");
 		element.innerHTML = template;
 		document.getElementById("list").prepend(element.content.firstChild);
@@ -28,13 +27,13 @@ const MESSAGES = {
 		superParent.style.height = "35px";
 		let language = navigator.languages[0];
 		let options = {};
-		template = dateEntryTemplate
+		template = resources["popup/src/templates/date_entry.html.template"]
 			.replace(/\$DATE/, new Date(message.date).toLocaleString(language, options));
 		element = document.createElement("template");
 		element.innerHTML = template;
 		superParent.appendChild(element.content.firstChild);
 		for (tab of message.tabs) {
-			template = tabEntryTemplate
+			template = resources["popup/src/templates/tab_entry.html.template"]
 				.replace(/\$TAB_NAME/, tab.title)
 				.replace(/\$TAB_URL/, tab.url);
 			element = document.createElement("template");
@@ -157,91 +156,12 @@ const MESSAGES = {
 	}
 };
 
-let dependencyCount = 0;
-function registerDependency() {
-	++dependencyCount;
-}
-
-let callCount = 0;
-function loadThenConnect() {
-	++callCount;
-	if (callCount === dependencyCount) {
-		port = browser.runtime.connect();
-		port.onMessage.addListener(function(message) {
-			MESSAGES[message.type](message.data);
-		});
-	}
-}
-
-let entryTemplate = false;
-registerDependency();
-fetch(browser.runtime.getURL("popup/tab_saver_entry.html.template"))
-	.then(response => response.text())
-	.then(function(response) {
-		entryTemplate = response;
-		loadThenConnect();
-	})
-	.catch(function(e) { console.log(e); entryTemplate = null; });
-
-let expandSvg = false;
-registerDependency();
-fetch(browser.runtime.getURL("popup/expand.svg"))
-	.then(response => response.text())
-	.then(function(response) {
-		expandSvg = response;
-		loadThenConnect();
-	})
-	.catch(function(e) { console.log(e); expandSvg = null; });
-
-let restoreSvg = false;
-registerDependency();
-fetch(browser.runtime.getURL("popup/restore.svg"))
-	.then(response => response.text())
-	.then(function(response) {
-		restoreSvg = response;
-		loadThenConnect();
-	})
-	.catch(function(e) { console.log(e); restoreSvg = null; });
-
-let restoreAndRemoveSvg = false;
-registerDependency();
-fetch(browser.runtime.getURL("popup/restore_and_remove.svg"))
-	.then(response => response.text())
-	.then(function(response) {
-		restoreAndRemoveSvg = response;
-		loadThenConnect();
-	})
-	.catch(function(e) { console.log(e); restoreAndRemoveSvg = null; });
-
-let removeSvg = false;
-registerDependency();
-fetch(browser.runtime.getURL("popup/remove.svg"))
-	.then(response => response.text())
-	.then(function(response) {
-		removeSvg = response;
-		loadThenConnect();
-	})
-	.catch(function(e) { console.log(e); removeSvg = null; });
-
-let tabEntryTemplate = false;
-registerDependency();
-fetch(browser.runtime.getURL("popup/tab_saver_tab_entry.html.template"))
-	.then(response => response.text())
-	.then(function(response) {
-		tabEntryTemplate = response;
-		loadThenConnect();
-	})
-	.catch(function(e) { console.log(e); tabEntryTemplate = null; });
-
-let dateEntryTemplate = false;
-registerDependency();
-fetch(browser.runtime.getURL("popup/tab_saver_date_entry.html.template"))
-	.then(response => response.text())
-	.then(function(response) {
-		dateEntryTemplate = response;
-		loadThenConnect();
-	})
-	.catch(function(e) { console.log(e); tabEntryTemplate = null; });
+loadCallbacks.push(() => {
+	port = browser.runtime.connect();
+	port.onMessage.addListener(function(message) {
+		MESSAGES[message.type](message.data);
+	});
+});
 
 let dummy = null;
 function textWidth(text, fontFamily, fontSize) {
@@ -268,18 +188,14 @@ function resizeInput(element) {
 	element.style.width = newWidth + "px";
 }
 
-registerDependency();
-window.addEventListener("load", function() {
+window.addEventListener("load", pseudoResource(() => {
 	window.addEventListener("unload", function(e) {
-		port.disconnect();
-		port = false;
+		if (port !== null) {
+			port.disconnect();
+			port = false;
+		}
 	});
 	dummy = document.getElementById("dummy");
-
-	let elements = document.getElementsByClassName("expand");
-	for (let i = 0; i < elements.length; ++i) {
-		let element = elements[i];
-	}
 
 	let windowName = document.getElementById("window_name");
 	windowName.addEventListener("keyup", function(e) {
@@ -298,6 +214,4 @@ window.addEventListener("load", function() {
 		}
 		port.postMessage({ type: "updateWindowName", data: { active: activeWindow, name: windowName.value } });
 	});
-
-	loadThenConnect();
-});
+}));
