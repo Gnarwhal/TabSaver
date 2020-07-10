@@ -12,33 +12,36 @@ const MESSAGES = {
 	},
 	addState: function(message) {
 		///////// FILL OUT TEMPLATE /////////
-		let template = resources["popup/src/templates/window_entry.html.template"]
-			.replace(/\$ID/, message.id)
-			.replace(/\$VALUE/, message.name)
-			.replace(/\$EXPAND/, resources["popup/res/expand.svg"])
-			.replace(/\$RESTORE/, resources["popup/res/restore.svg"])
-			.replace(/\$RESTORE_AND_REMOVE/, resources["popup/res/restore_and_remove.svg"])
-			.replace(/\$REMOVE/, resources["popup/res/remove.svg"]);
-		let element = document.createElement("template");
-		element.innerHTML = template;
-		document.getElementById("list").prepend(element.content.firstChild);
+		document.getElementById("list").prepend(completeTemplate(
+			"window_entry.html",
+			[
+				[ "$ID",                 message.id                                    ],
+				[ "$VALUE",              message.name                                  ],
+				[ "$EXPAND",             resources["popup/res/expand.svg"            ] ],
+				[ "$RESTORE",            resources["popup/res/restore.svg"           ] ],
+				[ "$RESTORE_AND_REMOVE", resources["popup/res/restore_and_remove.svg"] ],
+				[ "$REMOVE",             resources["popup/res/remove.svg"            ] ]
+			]
+		));
 		let superParent = document.getElementById(message.id.toString());
 		window.getComputedStyle(superParent).getPropertyValue("height");
 		superParent.style.height = "35px";
 		let language = navigator.languages[0];
 		let options = {};
-		template = resources["popup/src/templates/date_entry.html.template"]
-			.replace(/\$DATE/, new Date(message.date).toLocaleString(language, options));
-		element = document.createElement("template");
-		element.innerHTML = template;
-		superParent.appendChild(element.content.firstChild);
+		superParent.appendChild(completeTemplate(
+			"date_entry.html",
+			[
+				[ "$DATE", new Date(message.date).toLocaleString(language, options) ]
+			]
+		));
 		for (tab of message.tabs) {
-			template = resources["popup/src/templates/tab_entry.html.template"]
-				.replace(/\$TAB_NAME/, tab.title)
-				.replace(/\$TAB_URL/, tab.url);
-			element = document.createElement("template");
-			element.innerHTML = template;
-			superParent.appendChild(element.content.firstChild);
+			superParent.appendChild(completeTemplate(
+				"tab_entry.html",
+				[
+					[ "$TAB_NAME", tab.title ],
+					[ "$TAB_URL",  tab.url   ]
+				]
+			));
 			let tabParent = superParent.lastChild;
 			let urlDiv = tabParent.children[3];
 			urlDiv.addEventListener("animationiteration", function(e) {
