@@ -1,4 +1,4 @@
-<div class="date_parent">
+<div class="date parent">
 	<p class="date_literal">Date Created</p>
 	<p class="date_variable">$DATE</p>
 </div>

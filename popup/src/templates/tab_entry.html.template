@@ -1,6 +1,6 @@
-<div class="tab_parent">
-	<p class="tab_name_literal">Title</p>
+<div class="tab parent">
+	<p class="tab_literal name">Title</p>
 	<p class="tab_name">$TAB_NAME</p>
-	<p class="tab_url_literal">URL</p>
+	<p class="tab_literal url">URL</p>
 	<p class="tab_url">$TAB_URL</p>
 </div>
