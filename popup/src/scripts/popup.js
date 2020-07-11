@@ -11,7 +11,6 @@ const MESSAGES = {
 		headerLoading.parentElement.removeChild(headerLoading);
 	},
 	addState: function(message) {
-		///////// FILL OUT TEMPLATE /////////
 		document.getElementById("list").prepend(completeTemplate(
 			"window_entry.html",
 			[
@@ -23,9 +22,13 @@ const MESSAGES = {
 				[ "$REMOVE",             resources["popup/res/remove.svg"            ] ]
 			]
 		));
+
 		let superParent = document.getElementById(message.id.toString());
-		window.getComputedStyle(superParent).getPropertyValue("height");
+
+		// Have to trigger a reflow in order for the animation to trigger properly for whatever reason
+		superParent.offsetHeight;
 		superParent.style.height = "35px";
+
 		let language = navigator.languages[0];
 		let options = {};
 		superParent.appendChild(completeTemplate(
@@ -34,6 +37,7 @@ const MESSAGES = {
 				[ "$DATE", new Date(message.date).toLocaleString(language, options) ]
 			]
 		));
+
 		for (tab of message.tabs) {
 			superParent.appendChild(completeTemplate(
 				"tab_entry.html",
@@ -43,27 +47,23 @@ const MESSAGES = {
 				]
 			));
 			let tabParent = superParent.lastChild;
-			let urlDiv = tabParent.children[3];
-			urlDiv.addEventListener("animationiteration", function(e) {
-				urlDiv.style.animationPlayState = "paused";
-			});
 			tabParent.addEventListener("click", function(e) {
 				let superHeight = superParent.style.height;
 				superHeight = Number(superHeight.substring(0, superHeight.length - 2));
-				if (tabParent.classList.contains("tab_parent_expanded")) {
-					tabParent.classList.remove("tab_parent_expanded");
-					tabParent.children[0].classList.remove("tab_name_literal_expanded");
-					tabParent.children[1].classList.remove("tab_name_expanded");
-					tabParent.children[2].classList.remove("tab_url_literal_expanded");
-					tabParent.children[3].classList.remove("tab_url_expanded");
+				if (tabParent.classList.contains("expanded")) {
+					tabParent.classList.remove("expanded");
+					tabParent.children[0].classList.remove("expanded");
+					tabParent.children[1].classList.remove("expanded");
+					tabParent.children[2].classList.remove("expanded");
+					tabParent.children[3].classList.remove("expanded");
 					superHeight -= 35;
 					superParent.style.transitionDelay = "0.25s";
 				} else {
-					tabParent.classList.add("tab_parent_expanded");
-					tabParent.children[0].classList.add("tab_name_literal_expanded");
-					tabParent.children[1].classList.add("tab_name_expanded");
-					tabParent.children[2].classList.add("tab_url_literal_expanded");
-					tabParent.children[3].classList.add("tab_url_expanded");
+					tabParent.classList.add("expanded");
+					tabParent.children[0].classList.add("expanded");
+					tabParent.children[1].classList.add("expanded");
+					tabParent.children[2].classList.add("expanded");
+					tabParent.children[3].classList.add("expanded");
 					superHeight += 35;
 					superParent.style.transitionDelay = "0s";
 				}
@@ -71,7 +71,7 @@ const MESSAGES = {
 				superParent.style.height = superHeight + "px";
 			});
 		}
-		///////// SET ENTRY NAME PROPERTIES /////////
+		
 		let entryName = document.getElementById("tempEntryNameId");
 		resizeInput(entryName);
 		entryName.addEventListener("input", (e) => resizeInput(e.target));
@@ -89,7 +89,7 @@ const MESSAGES = {
 			port.postMessage({ type: "updateEntryName", data: { id: Number(parent.getAttribute("id")), name: entryName.value } });
 		});
 		entryName.removeAttribute("id");
-		///////// SET EXPAND PROPERTIES /////////
+		
 		let expand = document.getElementById("tempExpandId");
 		expand.addEventListener("click", function() {
 			if (expand.classList.contains("expanded")) {
@@ -102,7 +102,7 @@ const MESSAGES = {
 				let superHeight = 0;
 				for (child of superParent.children) {
 					superHeight += 35;
-					if (child.classList.contains("tab_parent_expanded")) {
+					if (child.classList.contains("expanded")) {
 						superHeight += 35;
 					}
 				}
@@ -110,7 +110,7 @@ const MESSAGES = {
 			}
 		});
 		expand.removeAttribute("id");
-		///////// SET RESTORE PROPERTIES /////////
+		
 		let restore = document.getElementById("tempRestoreId");
 		restore.addEventListener("click", function() {
 			let parent = restore.parentElement.parentElement.parentElement;
@@ -118,7 +118,6 @@ const MESSAGES = {
 		});
 		restore.removeAttribute("id");
 
-		///////// REMOVE ENTRY /////////
 		function removeEntry(parent) {
 			parent.children[0].children[0].style.marginLeft = "0%";
 			parent.children[0].children[0].style.width      = "100%";
@@ -135,9 +134,7 @@ const MESSAGES = {
 				}
 			});
 		}
-		////////////////////////////////
 
-		///////// SET RESTORE AND REMOVE PROPERTIES /////////
 		let restoreAndRemove = document.getElementById("tempRestoreAndRemoveId");
 		restoreAndRemove.addEventListener("click", function() {
 			let parent = restoreAndRemove.parentElement.parentElement.parentElement;
@@ -145,7 +142,7 @@ const MESSAGES = {
 			removeEntry(parent);
 		});
 		restoreAndRemove.removeAttribute("id");
-		///////// SET REMOVE PROPERTIES /////////
+		
 		let remove = document.getElementById("tempRemoveId");
 		remove.addEventListener("click", function() {
 			let parent = remove.parentElement.parentElement.parentElement;
@@ -178,26 +175,27 @@ function textWidth(text, fontFamily, fontSize) {
 
 function resizeInput(element) {
 	let style = window.getComputedStyle(element);
-	let newWidth = 0;
-	if (element.value === "") {
-		newWidth = textWidth(element.placeholder, style.getPropertyValue("font-family"), style.getPropertyValue("font-size"));
-	} else {
-		newWidth = textWidth(element.value, style.getPropertyValue("font-family"), style.getPropertyValue("font-size"));
+	let text = element.value;
+	if (text === "") {
+		text = element.placeholder;
 	}
-	const MIN_WIDTH = 8;
-	if (newWidth < 8) {
-		newWidth = 8;
-	}
-	element.style.width = newWidth + "px";
+	element.style.width = Math.max(
+		8, // Minimum width of the text field
+		textWidth(
+			text,
+			style.getPropertyValue("font-family"),
+			style.getPropertyValue("font-size")
+		)
+	) + "px";
 }
 
 window.addEventListener("load", pseudoResource(() => {
 	window.addEventListener("unload", function(e) {
 		if (port !== null) {
 			port.disconnect();
-			port = false;
 		}
 	});
+
 	dummy = document.getElementById("dummy");
 
 	let windowName = document.getElementById("window_name");
