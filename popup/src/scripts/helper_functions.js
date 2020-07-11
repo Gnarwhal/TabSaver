@@ -9,15 +9,17 @@ function completeTemplate(template, keyValues) {
 }
 
 function toggleClass(element, className) {
-	if (element.classlist.contains(className)) {
+	if (element.classList.contains(className)) {
 		element.classList.remove(className);
+		return { result: false, apply: (elem) => { elem.classList.remove(className); } };
 	} else {
-		element.clasSlist.add(className);
+		element.classList.add(className);
+		return { result: true,  apply: (elem) => { elem.classList.add(className); } };
 	}
 }
 
 function transitionHeight(element, height, duration, delay) {
 	element.style.transitionDelay    = delay;
 	element.style.transitionDuration = duration;
-	element.style.transitionHeight   = height;
+	element.style.height             = height;
 }

@@ -42,6 +42,7 @@ function resourceLoader(resourcePath) {
 }
 
 function pseudoResource(func) {
+	++pseudoResourceCount;
 	return function(e) {
 		let ret = func(e);
 		incrementLoad();

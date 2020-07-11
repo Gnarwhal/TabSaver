@@ -2,24 +2,25 @@
 
 ## About
 
+### Version Info
+
+Version: v0.0.1 pre-alpha
+
+### Summary
+
 At it's core the aptly named "Tab Saver" is just that. A tab saver. During the duration of a windows life it tracks
 the state of your tabs ~~and sells it to google~~. Then, upon the merciless execution of said window
 that tab data gets saved and can be restored at a later date. 
 
-### The name...
-
-...is not so good. I'm aware. Tab Saver is just a working name. I don't have viable ideas atm, but when I do rest assured
-this will be updated. 
-
 ## Next Steps
-
-I have a nasty tendency to write these and then never act on them. So...don't get your hopes up. 
 
 1. Testing. Lots of testing. \*closes book\* Like that's ever gonna happen.
 2. Add more features
 3. Rinse and repeat
 
 ### Feature Ideas
+
+I have a nasty tendency to write these and then never act on them. So...don't get your hopes up. 
 
 - Snapshotting current state
 - Living window management
@@ -28,9 +29,4 @@ I have a nasty tendency to write these and then never act on them. So...don't ge
 - Sync vs local storage
 - Incremental Loading(? idk what to call it) 
 
-I would take feature requests, but I'm the only user lol. 
-
-## Side Notes
-
-I wanted to name this project WinDex (window indexer) but my lawyers said that wouldn't go over so well with the
-window cleaner company (bonus side note: I have no lawyers. 噓つきな人).
+I would take feature requests, but I'm the only user lol (BUT if you want to request features, PLEASE DO!).

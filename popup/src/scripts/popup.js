@@ -48,27 +48,17 @@ const MESSAGES = {
 			));
 			let tabParent = superParent.lastChild;
 			tabParent.addEventListener("click", function(e) {
+				let toggleResult = toggleClass(tabParent, "expanded");
+				for (child of tabParent.children) {
+					toggleResult.apply(child);
+				}
 				let superHeight = superParent.style.height;
 				superHeight = Number(superHeight.substring(0, superHeight.length - 2));
-				if (tabParent.classList.contains("expanded")) {
-					tabParent.classList.remove("expanded");
-					tabParent.children[0].classList.remove("expanded");
-					tabParent.children[1].classList.remove("expanded");
-					tabParent.children[2].classList.remove("expanded");
-					tabParent.children[3].classList.remove("expanded");
-					superHeight -= 35;
-					superParent.style.transitionDelay = "0.25s";
+				if (toggleResult.result) {
+					transitionHeight(superParent, superHeight + 35 + "px", "0.25s", "0s"); 
 				} else {
-					tabParent.classList.add("expanded");
-					tabParent.children[0].classList.add("expanded");
-					tabParent.children[1].classList.add("expanded");
-					tabParent.children[2].classList.add("expanded");
-					tabParent.children[3].classList.add("expanded");
-					superHeight += 35;
-					superParent.style.transitionDelay = "0s";
+					transitionHeight(superParent, superHeight - 35 + "px", "0.25s", "0.25s"); 
 				}
-				superParent.style.transitionDuration = "0.25s";
-				superParent.style.height = superHeight + "px";
 			});
 		}
 		
@@ -89,16 +79,25 @@ const MESSAGES = {
 			port.postMessage({ type: "updateEntryName", data: { id: Number(parent.getAttribute("id")), name: entryName.value } });
 		});
 		entryName.removeAttribute("id");
+
+		function addClickListener(name, action) {
+			let element = document.getElementById("temp" + name + "Id");
+			element.addEventListener("click", (event) => {
+				action(event, element);
+			});
+			element.removeAttribute("id");
+		}
+
+		function addMessageClickListener(name, action) {
+			addClickListener(name.charAt(0).toUpperCase() + name.splice(1), (event) => {
+				port.postMessage({ type: name, data: { id: Number(supeParent.getAttribute("id")) } });
+				action(event)
+			});
+		}
 		
-		let expand = document.getElementById("tempExpandId");
-		expand.addEventListener("click", function() {
-			if (expand.classList.contains("expanded")) {
-				expand.classList.remove("expanded");
-				superParent.style.transitionDelay = "0s";
-				superParent.style.transitionDuration = "0.5s";
-				superParent.style.height = "35px";
-			} else {
-				expand.classList.add("expanded");
+		addClickListener("Expand", (event, expand) => {
+			let toggleResult = toggleClass(expand, "expanded");
+			if (toggleResult.result) {
 				let superHeight = 0;
 				for (child of superParent.children) {
 					superHeight += 35;
@@ -106,50 +105,33 @@ const MESSAGES = {
 						superHeight += 35;
 					}
 				}
-				superParent.style.height = superHeight + "px";
+				transitionHeight(superParent, superHeight + "px", "0.5s", "0s");
+			} else {
+				transitionHeight(superParent, "35px", "0.5s", "0s");
 			}
 		});
 		expand.removeAttribute("id");
 		
-		let restore = document.getElementById("tempRestoreId");
-		restore.addEventListener("click", function() {
-			let parent = restore.parentElement.parentElement.parentElement;
-			port.postMessage({ type: "restore", data: { id: Number(parent.getAttribute("id")) } });
-		});
-		restore.removeAttribute("id");
+		addMessageClickListener("restore", (event) => {});
 
-		function removeEntry(parent) {
-			parent.children[0].children[0].style.marginLeft = "0%";
-			parent.children[0].children[0].style.width      = "100%";
+		function removeEntry() {
+			let deleteBackground = superParent.firstChild.firstChild;
+			deleteBackground.style.marginLeft = "0%";
+			deleteBackground.style.width      = "100%";
 
-			parent.style.transitionDuration = "0.5s";
-			parent.style.transitionDelay = "0.1s";
-			parent.style.height = "0%";
+			transitionHeight(superParent, "0%", "0.5s", "0.1s");
 
-			parent.addEventListener("transitionend", (e) => {
-				let height = window.getComputedStyle(parent).getPropertyValue("height");
+			superParent.addEventListener("transitionend", (e) => {
+				let height = window.getComputedStyle(superParent).getPropertyValue("height");
 				height = Number(height.substring(0, height.length - 2));
 				if (e.propertyName === "height" && height < 10) {
-					parent.parentElement.removeChild(parent);
+					superParent.parentElement.removeChild(superParent);
 				}
 			});
 		}
 
-		let restoreAndRemove = document.getElementById("tempRestoreAndRemoveId");
-		restoreAndRemove.addEventListener("click", function() {
-			let parent = restoreAndRemove.parentElement.parentElement.parentElement;
-			port.postMessage({ type: "restoreAndRemove", data: { id: Number(parent.getAttribute("id")) } });
-			removeEntry(parent);
-		});
-		restoreAndRemove.removeAttribute("id");
-		
-		let remove = document.getElementById("tempRemoveId");
-		remove.addEventListener("click", function() {
-			let parent = remove.parentElement.parentElement.parentElement;
-			port.postMessage({ type: "remove", data: { id: Number(parent.getAttribute("id")) } });
-			removeEntry(parent);
-		});
-		remove.removeAttribute("id");
+		addMessageelickListener("RestoreAndRemove", removeEntry);
+		addMessageClickListener("Remove",           removeEntry);
 	},
 	complete: function() {
 		document.getElementById("entry_loading").style.display = "none";
