@@ -1,10 +1,13 @@
 # Tab Saver
 
-## About
-
 ### Version Info
 
-Version: v0.0.1 pre-alpha
+Latest Version: [v0.0.0-alpha](https://github.com/Gnarwhal/TabSaver/raw/master/tab_saver-v0.0.0-alpha.xpi)
+
+### Installation
+
+Once you've downloaded the [latest xpi file](https://github.com/Gnarwhal/TabSaver/raw/master/tab_saver-v0.0.0-alpha.xpi),
+just drag it into your firefox and firefox will recognize it as an extension. Accept all the permissions and firefox will install the addon. 
 
 ### Summary
 
