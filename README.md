@@ -33,3 +33,30 @@ I have a nasty tendency to write these and then never act on them. So...don't ge
 - Incremental Loading(? idk what to call it) 
 
 I would take feature requests, but I'm the only user lol (BUT if you want to request features, PLEASE DO!).
+
+## Release Steps (For Personal Use)
+
+### Pre Release
+
+1. Update the version numbers in background.js and manifest.json
+2. Remove the `-dev` postfix from the extension id and icon path in manifest.json
+	- NOTE: Not necessary to update the logo since it's use case does not cause confusion
+3. Create the xpi file
+```
+///// FILES TO INCLUDE /////
+- background/
+- icons/
+- popup/
+- LICENSE
+- manifest.json
+```
+4. Upload the xpi file as a new version on mozilla addons
+5. Download the signed xpi file
+6. Rename the xpi file: `tab_saver-$version.xpi`
+7. Update the download links in the README.md
+8. Commit and push the new release
+9. Create the release on github
+
+### Post Release
+
+1. Readd the `-dev` postfix to the extension id and icon path in manifest.json

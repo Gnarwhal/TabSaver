@@ -75,8 +75,7 @@ const MESSAGES = {
 			if (entryName.value === "") {
 				entryName.value = entryName.placeholder;
 			}
-			let parent = entryName.parentElement.parentElement.parentElement;
-			port.postMessage({ type: "updateEntryName", data: { id: Number(parent.getAttribute("id")), name: entryName.value } });
+			port.postMessage({ type: "updateEntryName", data: { id: Number(superParent.getAttribute("id")), name: entryName.value } });
 		});
 		entryName.removeAttribute("id");
 
@@ -89,8 +88,8 @@ const MESSAGES = {
 		}
 
 		function addMessageClickListener(name, action) {
-			addClickListener(name.charAt(0).toUpperCase() + name.splice(1), (event) => {
-				port.postMessage({ type: name, data: { id: Number(supeParent.getAttribute("id")) } });
+			addClickListener(name.charAt(0).toUpperCase() + name.substring(1), (event) => {
+				port.postMessage({ type: name, data: { id: Number(superParent.getAttribute("id")) } });
 				action(event)
 			});
 		}
@@ -110,12 +109,11 @@ const MESSAGES = {
 				transitionHeight(superParent, "35px", "0.5s", "0s");
 			}
 		});
-		expand.removeAttribute("id");
 		
 		addMessageClickListener("restore", (event) => {});
 
 		function removeEntry() {
-			let deleteBackground = superParent.firstChild.firstChild;
+			let deleteBackground = superParent.children[0].children[0];
 			deleteBackground.style.marginLeft = "0%";
 			deleteBackground.style.width      = "100%";
 
@@ -130,8 +128,8 @@ const MESSAGES = {
 			});
 		}
 
-		addMessageelickListener("RestoreAndRemove", removeEntry);
-		addMessageClickListener("Remove",           removeEntry);
+		addMessageClickListener("restoreAndRemove", removeEntry);
+		addMessageClickListener("remove",           removeEntry);
 	},
 	complete: function() {
 		document.getElementById("entry_loading").style.display = "none";

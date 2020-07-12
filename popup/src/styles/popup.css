@@ -333,7 +333,7 @@ input:focus {
 
 .tab_name {
 	margin-left: 25px;
-	width: calc(50% - 25px);
+	width: calc(50% - 50px);
 	color: var(--main-foreground-color);
 
 	transition-property: margin-left, width, color;

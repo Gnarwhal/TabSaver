@@ -15,7 +15,7 @@ function load() {
 			function format(version) {
 				return "v" + version.number[0] + "." + version.number[1] + "." + version.number[2] + " - " + version.stage;
 			}
-			const CURRENT_VERSION = { number: [ 0, 0, 0 ], stage: "alpha" };
+			const CURRENT_VERSION = { number: [ 0, 0, 1 ], stage: "alpha" };
 			console.log("Version Info: " + format(CURRENT_VERSION));
 
 			// Handle version changes //
