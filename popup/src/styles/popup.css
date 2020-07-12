@@ -10,8 +10,7 @@
 	--main-info-color: #ff7f8a;
 	--secondary-info-color: #7f3339;
 
-	--main-hover-color: #64cfdb;
-
+	--main-hover-color: #4ecad8;
 	--main-active-color: #266f77;
 
 	/* BUTTONS */
@@ -23,6 +22,8 @@
 	
 	--remove-hover-color: #ff4252;
 	--remove-active-color: #cc1426;
+
+	--parent-height: 38px;
 }
 
 html, body {
@@ -46,7 +47,7 @@ input:focus {
 	color: var(--secondary-foreground-color);
 }
 
-#dummy {
+#width_dummy {
 	position: fixed;
 	visibility: hidden;
 }
@@ -102,9 +103,9 @@ input:focus {
 }
 
 #entry_loading {
-	height: 35px;
+	height: var(--parent-height);
 
-	line-height: 35px;
+	line-height: var(--parent-height);
 	font-size: 100%;
 	font-family: "Josefin Sans", sans-serif;
 	text-align: center;
@@ -113,11 +114,13 @@ input:focus {
 }
 
 .super_parent {
+	--super-height: 0;
+
 	box-sizing: border-box;
 	border-bottom: solid 1px var(--main-border-color);
 
 	width: 100%;
-	height: 0px;
+	height: calc(var(--parent-height) * var(--super-height));
 
 	overflow: hidden;
 	position: relative;
@@ -129,7 +132,7 @@ input:focus {
 .parent {
 	box-sizing: border-box;
 	width: 100%;
-	height: 35px;
+	height: var(--parent-height);
 
 	background-color: var(--main-background-color);
 
@@ -145,6 +148,7 @@ input:focus {
 }
 
 .tab.parent {
+	user-select: none;
 	transition: height 0.25s;
 	transition-delay: 0.25s;
 }
@@ -154,7 +158,7 @@ input:focus {
 }
 
 .tab.parent.expanded {
-	height: 70px;
+	height: calc(var(--parent-height) * 2);
 	transition-delay: 0s;
 }
 
@@ -205,7 +209,7 @@ input:focus {
 }
 
 .button {
-	height: 60%;
+	width: 20px;
 	fill: var(--main-background-color);
 	visibility: visible;
 	transition: fill 0.25s, transform 0.25s;
@@ -219,9 +223,21 @@ input:focus {
     fill: var(--main-foreground-color);
 }
 
+.button.expand:active {
+	fill: var(--secondary-foreground-color);
+}
+
 .button.expand.expanded {
 	fill: var(--secondary-foreground-color);
 	transform: rotate(90deg);
+}
+
+.button.expand.expanded:hover {
+	fill: var(--main-foreground-color);
+}
+
+.button.expand.expanded:active {
+	fill: var(--secondary-foreground-color);
 }
 
 .button.restore:hover {
@@ -264,9 +280,9 @@ input:focus {
 	box-sizing: border-box;
 	margin: 0px;
 
-	height: 35px;
+	height: var(--parent-height);
 
-	line-height: 35px;
+	line-height: var(--parent-height);
 	font-size: 100%;
 	font-family: "Josefin Sans", sans-serif;
 	white-space: nowrap;
@@ -294,9 +310,9 @@ input:focus {
 	padding-left: 25px;
 
 	width: 25px;
-	height: 35px;
+	height: var(--parent-height);
 
-	line-height: 35px;
+	line-height: var(--parent-height);
 	font-size: 100%;
 	font-family: "Josefin Sans", sans-serif;
 	white-space: nowrap;
@@ -306,17 +322,25 @@ input:focus {
 
 	position: absolute;
 
-	transition-property: width;
-	transition-duration: 0.25s;
+	transition-property: width, color;
+	transition-duration: 0.25s, 0.15s;
+}
+
+.tab_literal:hover {
+	color: var(--main-hover-color);
+}
+
+.tab_literal:active {
+	color: var(--main-active-color);
 }
 
 .tab_literal.name {
-	transition-delay: 0s;
+	transition-delay: 0s, 0s;
 }
 
 .tab_literal.url {
-	margin-top: 35px;
-	transition-delay: 0.1s;
+	margin-top: var(--parent-height);
+	transition-delay: 0.1s, 0s;
 }
 
 .tab_literal.expanded {
@@ -324,11 +348,11 @@ input:focus {
 }
 
 .tab_literal.name.expanded {
-	transition-delay: 0.35s;
+	transition-delay: 0.35s, 0s;
 }
 
 .tab_literal.url.expanded {
-	transition-delay: 0.4s;
+	transition-delay: 0.4s, 0s;
 }
 
 .tab_name {
@@ -362,6 +386,6 @@ input:focus {
 }
 
 .tab_url.expanded {
-	margin-top: 35px;
+	margin-top: var(--parent-height);
 	transition-delay: 0s, 0.25s, 0.25s;
 }

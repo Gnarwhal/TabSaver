@@ -23,11 +23,12 @@ const MESSAGES = {
 			]
 		));
 
+		let superHeight = 1;
 		let superParent = document.getElementById(message.id.toString());
 
 		// Have to trigger a reflow in order for the animation to trigger properly for whatever reason
 		superParent.offsetHeight;
-		superParent.style.height = "35px";
+		superParent.style.setProperty("--super-height", "1");
 
 		let language = navigator.languages[0];
 		let options = {};
@@ -47,17 +48,23 @@ const MESSAGES = {
 				]
 			));
 			let tabParent = superParent.lastChild;
+			for (let i = 0; i < 2; ++i) {
+				tabParent.children[i * 2].addEventListener("click", (event) => {
+					event.stopPropagation();
+					navigator.clipboard.writeText(tabParent.children[i * 2 + 1].textContent).catch(console.log);
+				});
+			}
 			tabParent.addEventListener("click", function(e) {
 				let toggleResult = toggleClass(tabParent, "expanded");
 				for (child of tabParent.children) {
 					toggleResult.apply(child);
 				}
-				let superHeight = superParent.style.height;
-				superHeight = Number(superHeight.substring(0, superHeight.length - 2));
 				if (toggleResult.result) {
-					transitionHeight(superParent, superHeight + 35 + "px", "0.25s", "0s"); 
+					superHeight += 1;
+					transitionHeight(superParent, superHeight, "0.25s", "0s"); 
 				} else {
-					transitionHeight(superParent, superHeight - 35 + "px", "0.25s", "0.25s"); 
+					superHeight -= 1;
+					transitionHeight(superParent, superHeight, "0.25s", "0.25s"); 
 				}
 			});
 		}
@@ -97,17 +104,17 @@ const MESSAGES = {
 		addClickListener("Expand", (event, expand) => {
 			let toggleResult = toggleClass(expand, "expanded");
 			if (toggleResult.result) {
-				let superHeight = 0;
+				superHeight = 0;
 				for (child of superParent.children) {
-					superHeight += 35;
+					superHeight += 1;
 					if (child.classList.contains("expanded")) {
-						superHeight += 35;
+						superHeight += 1;
 					}
 				}
-				transitionHeight(superParent, superHeight + "px", "0.5s", "0s");
 			} else {
-				transitionHeight(superParent, "35px", "0.5s", "0s");
+				superHeight = 1;
 			}
+			transitionHeight(superParent, superHeight, "0.5s", "0s"); 
 		});
 		
 		addMessageClickListener("restore", (event) => {});
@@ -117,7 +124,7 @@ const MESSAGES = {
 			deleteBackground.style.marginLeft = "0%";
 			deleteBackground.style.width      = "100%";
 
-			transitionHeight(superParent, "0%", "0.5s", "0.1s");
+			transitionHeight(superParent, "0.5s", "0.1s");
 
 			superParent.addEventListener("transitionend", (e) => {
 				let height = window.getComputedStyle(superParent).getPropertyValue("height");
@@ -143,16 +150,6 @@ loadCallbacks.push(() => {
 	});
 });
 
-let dummy = null;
-function textWidth(text, fontFamily, fontSize) {
-	dummy.style.fontFamily = fontFamily;
-	dummy.style.fontSize = fontSize;
-	dummy.textContent = '|';
-	let pipe_width = dummy.clientWidth;
-	dummy.textContent = '|' + text + '|';
-	return dummy.clientWidth - 2 * pipe_width;
-}
-
 function resizeInput(element) {
 	let style = window.getComputedStyle(element);
 	let text = element.value;
@@ -176,7 +173,8 @@ window.addEventListener("load", pseudoResource(() => {
 		}
 	});
 
-	dummy = document.getElementById("dummy");
+	widthDummy = document.getElementById("width_dummy");
+	copyDummy = document.getElementById("copy_dummy");
 
 	let windowName = document.getElementById("window_name");
 	windowName.addEventListener("keyup", function(e) {
