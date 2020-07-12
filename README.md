@@ -60,3 +60,4 @@ I would take feature requests, but I'm the only user lol (BUT if you want to req
 ### Post Release
 
 1. Readd the `-dev` postfix to the extension id and icon path in manifest.json
+2. Remove the created .xpi file leaving only the signed one
